@@ -1,0 +1,12 @@
+th.sortable {
+  cursor: pointer;
+}
+th.sortable:hover {
+  background: #888;
+}
+th.sortable.ascending:after {
+  content: ' ↓';
+}
+th.sortable.descending:after {
+  content: ' ↑';
+}

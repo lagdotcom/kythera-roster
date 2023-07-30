@@ -1,0 +1,42 @@
+/* src/components/App.css */
+html,
+head,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* src/components/Loader.css */
+.loader {
+  cursor: progress;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+/* src/components/MainLayout.css */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+tr:hover {
+  background: #eee;
+}
+th {
+  background: #aaa;
+}
+
+/* src/components/SortableTableHeading.css */
+th.sortable {
+  cursor: pointer;
+}
+th.sortable:hover {
+  background: #888;
+}
+th.sortable.ascending:after {
+  content: " \2193";
+}
+th.sortable.descending:after {
+  content: " \2191";
+}
