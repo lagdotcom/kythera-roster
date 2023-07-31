@@ -1,6 +1,17 @@
 import "./MainLayout.css";
 
-import useTable from "../hooks/useTable";
+import {
+  ColumnFiltersState,
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useState } from "preact/hooks";
+
 import PC from "../PC";
 import SortableTableHeading from "./SortableTableHeading";
 
@@ -8,44 +19,70 @@ interface Props {
   data: PC[];
 }
 
-export default function MainLayout({ data }: Props) {
-  const { rows, setSortField, sorts } = useTable(data, {
-    fields: { id: { type: "number" }, totalLevel: { type: "number" } },
-    defaultFilters: [{ field: "status", eq: "alive" }],
-    defaultSorts: [{ field: "name", descending: false }],
-  });
+const columnHelper = createColumnHelper<PC>();
+const columns = [
+  columnHelper.accessor("status", { header: "Status" }),
+  columnHelper.accessor("id", { header: "ID" }),
+  columnHelper.accessor("player", { header: "Player" }),
+  columnHelper.accessor("name", { header: "Name" }),
+  columnHelper.accessor("totalLevel", { header: "Level" }),
+  columnHelper.accessor("niceRace", { header: "Race" }),
+  columnHelper.accessor("niceClassList", { header: "Class" }),
+];
 
-  const heading = (field: keyof PC, label: string) => (
-    <SortableTableHeading
-      field={field}
-      setSortField={setSortField}
-      sorts={sorts}
-    >
-      {label}
-    </SortableTableHeading>
-  );
+export default function MainLayout({ data }: Props) {
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
+    { id: "status", value: "alive" },
+  ]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "name", desc: false },
+  ]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      columnFilters,
+      columnVisibility: { status: false },
+      globalFilter,
+      sorting,
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+  });
 
   return (
     <table className="main">
       <thead>
-        <tr>
-          {heading("id", "ID")}
-          {heading("player", "Player")}
-          {heading("name", "Name")}
-          {heading("totalLevel", "Level")}
-          {heading("niceRace", "Race")}
-          {heading("niceClassList", "Class")}
-        </tr>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header) =>
+              header.column.getCanSort() ? (
+                <SortableTableHeading key={header.id} header={header} />
+              ) : (
+                <th key={header.id} colSpan={header.colSpan}>
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                </th>
+              )
+            )}
+          </tr>
+        ))}
       </thead>
       <tbody>
-        {rows.map((pc, index) => (
+        {table.getRowModel().rows.map((row, index) => (
           <tr key={index}>
-            <td>{pc.id}</td>
-            <td>{pc.player}</td>
-            <td>{pc.name}</td>
-            <td>{pc.totalLevel}</td>
-            <td>{pc.niceRace}</td>
-            <td>{pc.niceClassList}</td>
+            {row.getVisibleCells().map((cell) => (
+              <td key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
+            ))}
           </tr>
         ))}
       </tbody>

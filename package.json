@@ -11,12 +11,14 @@
   "author": "Lag.Com <lagdotcom@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-table": "^8.9.3",
     "preact": "^10.16.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "esbuild": "^0.18.17",
+    "esbuild-plugin-alias": "^0.2.1",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-jsx-a11y": "^6.7.1",

@@ -60,6 +60,13 @@
     }
   });
 
+  // globalExternal:@tanstack/react-table
+  var require_react_table = __commonJS({
+    "globalExternal:@tanstack/react-table"(exports, module) {
+      module.exports = globalThis.ReactTable;
+    }
+  });
+
   // src/index.tsx
   var import_preact3 = __toESM(require_preact());
 
@@ -228,142 +235,69 @@
     return /* @__PURE__ */ o("div", { className: "loader", children: "Loading..." });
   }
 
-  // src/hooks/useTable.ts
+  // src/components/MainLayout.tsx
+  var import_react_table2 = __toESM(require_react_table());
   var import_hooks = __toESM(require_hooks());
-  var DefaultFieldConfig = { type: "string" };
-  function makeFilterFn(filters, config) {
-    const matchers = [];
-    for (const entry of filters) {
-      if (entry.eq)
-        matchers.push((pc) => pc[entry.field] === entry.eq);
-    }
-    return (e) => matchers.every((fn) => fn(e));
-  }
-  var makeComparator = {
-    number: (field, descending) => {
-      if (descending)
-        return (a, b) => b[field] - a[field];
-      return (a, b) => a[field] - b[field];
-    },
-    string: (field, descending) => {
-      if (descending)
-        return (a, b) => b[field].localeCompare(a[field]);
-      return (a, b) => a[field].localeCompare(b[field]);
-    }
-  };
-  function makeSortFn(sorts, config) {
-    var _a;
-    const comparators = [];
-    for (const sort of sorts) {
-      const fieldConfig = (_a = config.fields[sort.field]) != null ? _a : DefaultFieldConfig;
-      comparators.push(
-        makeComparator[fieldConfig.type](sort.field, sort.descending)
-      );
-    }
-    return (a, b) => {
-      for (const cmp of comparators) {
-        const result = cmp(a, b);
-        if (result)
-          return result;
-      }
-      return 0;
-    };
-  }
-  function useTable(data, config) {
-    var _a, _b;
-    const [filters, setFilters] = (0, import_hooks.useState)(
-      (_a = config.defaultFilters) != null ? _a : []
-    );
-    const [sorts, setSorts] = (0, import_hooks.useState)((_b = config.defaultSorts) != null ? _b : []);
-    const setSortField = (field) => {
-      if (sorts.length === 1 && sorts[0].field === field) {
-        return setSorts([{ field, descending: !sorts[0].descending }]);
-      }
-      setSorts([{ field, descending: false }]);
-    };
-    const filter = (0, import_hooks.useMemo)(
-      () => makeFilterFn(filters, config),
-      [config, filters]
-    );
-    const sort = (0, import_hooks.useMemo)(() => makeSortFn(sorts, config), [config, sorts]);
-    const filteredData = (0, import_hooks.useMemo)(() => data.filter(filter), [data, filter]);
-    const rows = (0, import_hooks.useMemo)(() => filteredData.sort(sort), [filteredData, sort]);
-    return { filters, sorts, rows, setSortField };
-  }
-
-  // src/tools/classnames.ts
-  function classnames(...entries) {
-    const classnames2 = [];
-    for (const e of entries) {
-      if (typeof e === "undefined")
-        continue;
-      if (typeof e === "string")
-        classnames2.push(e);
-      else {
-        for (const k in e) {
-          if (e[k])
-            entries.push(k);
-        }
-      }
-    }
-    return classnames2.join(" ");
-  }
 
   // src/components/SortableTableHeading.tsx
-  function SortableTableHeading({
-    children,
-    field,
-    setSortField,
-    sorts
-  }) {
-    const onClick = () => setSortField(field);
-    const sorting = sorts.find((s) => s.field === field);
+  var import_react_table = __toESM(require_react_table());
+  function SortableTableHeading({ header }) {
+    var _a;
     return /* @__PURE__ */ o(
       "th",
       {
-        className: classnames("sortable", {
-          ascending: (sorting == null ? void 0 : sorting.descending) === false,
-          descending: (sorting == null ? void 0 : sorting.descending) === true
-        }),
-        onClick,
-        children
+        className: "sortable",
+        colSpan: header.colSpan,
+        onClick: header.column.getToggleSortingHandler(),
+        children: [
+          (0, import_react_table.flexRender)(header.column.columnDef.header, header.getContext()),
+          (_a = { asc: " \u{1F53C}", desc: " \u{1F53D}" }[header.column.getIsSorted()]) != null ? _a : null
+        ]
       }
     );
   }
 
   // src/components/MainLayout.tsx
+  var columnHelper = (0, import_react_table2.createColumnHelper)();
+  var columns = [
+    columnHelper.accessor("status", { header: "Status" }),
+    columnHelper.accessor("id", { header: "ID" }),
+    columnHelper.accessor("player", { header: "Player" }),
+    columnHelper.accessor("name", { header: "Name" }),
+    columnHelper.accessor("totalLevel", { header: "Level" }),
+    columnHelper.accessor("niceRace", { header: "Race" }),
+    columnHelper.accessor("niceClassList", { header: "Class" })
+  ];
   function MainLayout({ data }) {
-    const { rows, setSortField, sorts } = useTable(data, {
-      fields: { id: { type: "number" }, totalLevel: { type: "number" } },
-      defaultFilters: [{ field: "status", eq: "alive" }],
-      defaultSorts: [{ field: "name", descending: false }]
+    const [globalFilter, setGlobalFilter] = (0, import_hooks.useState)("");
+    const [columnFilters, setColumnFilters] = (0, import_hooks.useState)([
+      { id: "status", value: "alive" }
+    ]);
+    const [sorting, setSorting] = (0, import_hooks.useState)([
+      { id: "name", desc: false }
+    ]);
+    const table = (0, import_react_table2.useReactTable)({
+      data,
+      columns,
+      state: {
+        columnFilters,
+        columnVisibility: { status: false },
+        globalFilter,
+        sorting
+      },
+      getCoreRowModel: (0, import_react_table2.getCoreRowModel)(),
+      getFilteredRowModel: (0, import_react_table2.getFilteredRowModel)(),
+      getSortedRowModel: (0, import_react_table2.getSortedRowModel)(),
+      onSortingChange: setSorting
     });
-    const heading = (field, label) => /* @__PURE__ */ o(
-      SortableTableHeading,
-      {
-        field,
-        setSortField,
-        sorts,
-        children: label
-      }
-    );
     return /* @__PURE__ */ o("table", { className: "main", children: [
-      /* @__PURE__ */ o("thead", { children: /* @__PURE__ */ o("tr", { children: [
-        heading("id", "ID"),
-        heading("player", "Player"),
-        heading("name", "Name"),
-        heading("totalLevel", "Level"),
-        heading("niceRace", "Race"),
-        heading("niceClassList", "Class")
-      ] }) }),
-      /* @__PURE__ */ o("tbody", { children: rows.map((pc, index) => /* @__PURE__ */ o("tr", { children: [
-        /* @__PURE__ */ o("td", { children: pc.id }),
-        /* @__PURE__ */ o("td", { children: pc.player }),
-        /* @__PURE__ */ o("td", { children: pc.name }),
-        /* @__PURE__ */ o("td", { children: pc.totalLevel }),
-        /* @__PURE__ */ o("td", { children: pc.niceRace }),
-        /* @__PURE__ */ o("td", { children: pc.niceClassList })
-      ] }, index)) })
+      /* @__PURE__ */ o("thead", { children: table.getHeaderGroups().map((headerGroup) => /* @__PURE__ */ o("tr", { children: headerGroup.headers.map(
+        (header) => header.column.getCanSort() ? /* @__PURE__ */ o(SortableTableHeading, { header }, header.id) : /* @__PURE__ */ o("th", { colSpan: header.colSpan, children: (0, import_react_table2.flexRender)(
+          header.column.columnDef.header,
+          header.getContext()
+        ) }, header.id)
+      ) }, headerGroup.id)) }),
+      /* @__PURE__ */ o("tbody", { children: table.getRowModel().rows.map((row, index) => /* @__PURE__ */ o("tr", { children: row.getVisibleCells().map((cell) => /* @__PURE__ */ o("td", { children: (0, import_react_table2.flexRender)(cell.column.columnDef.cell, cell.getContext()) }, cell.id)) }, index)) })
     ] });
   }
 

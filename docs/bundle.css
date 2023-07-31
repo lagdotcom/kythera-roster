@@ -25,6 +25,8 @@ tr:hover {
 }
 th {
   background: #aaa;
+  padding: 0;
+  line-height: 26px;
 }
 
 /* src/components/SortableTableHeading.css */
@@ -33,10 +35,4 @@ th.sortable {
 }
 th.sortable:hover {
   background: #888;
-}
-th.sortable.ascending:after {
-  content: " \2193";
-}
-th.sortable.descending:after {
-  content: " \2191";
 }

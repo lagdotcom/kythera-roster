@@ -9,4 +9,6 @@ tr:hover {
 
 th {
   background: #aaa;
+  padding: 0;
+  line-height: 26px;
 }

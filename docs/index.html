@@ -9,6 +9,9 @@
 <body>
   <script src="https://unpkg.com/preact@10.16.0/dist/preact.min.js"></script>
   <script src="https://unpkg.com/preact@10.16.0/hooks/dist/hooks.umd.js"></script>
+  <script src="https://unpkg.com/preact@10.16.0/compat/dist/compat.umd.js"></script>
+  <script>window.React = window.preactCompat;</script>
+  <script src="https://unpkg.com/@tanstack/react-table@8.9.3/build/umd/index.production.js"></script>
   <script src="bundle.js" async defer></script>
 </body>
 </html>

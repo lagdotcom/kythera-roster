@@ -5,6 +5,7 @@ const externals = {
   "preact/hooks": "preactHooks",
   "@preact/signals-core": "preactSignalsCore",
   "@preact/signals": "preactSignals",
+  "@tanstack/react-table": "ReactTable",
 };
 
 const filter = new RegExp(
